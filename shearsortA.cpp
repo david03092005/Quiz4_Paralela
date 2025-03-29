@@ -40,7 +40,7 @@ void merge(vector<int>& arr, int left, int mid, int right){
                 k++;
         }
 
-        while(j < n2){
+        while(j < n1){
                 arr[k] = R[j];
                 j++;
                 k++;
@@ -66,31 +66,33 @@ void sortRow(vector<vector<int>>& matrix, int row, bool ascending){
         }
 }
 
-// Función para ordenar las columnas de forma descendente.
-void sortColumn(vector<vector<int>>& matrix, int col){
+// Implememtación del shearSort con transpocisión.
+void alternativeShearSort(vector<vector<int>>& matrix){
         int n = matrix.size();
-        vector<int> column(n);
-        for (int i = 0; i < n; i++) {
-                column[i] = matrix[i][col];
-        }
-
-        mergeSort(column, 0, n - 1);
-        for (int i = 0; i < n; i++) {
-                matrix[i][col] = column[i];
-        }
-}
-
-// Implementación del shearSort.
-void shearSort(vector<vector<int>>& matrix){
-        int n = matrix.size();
-        int iterations = log2(n) + 1;
-        for (int i = 0; i < iterations; i++) {
-                for(int row = 0; row < n; row++){
-                        sortRow(matrix, row, row % 2 == 0);
+        int repeat = ceil(log2(n)) + 1;
+        for(int r = 0; r < repeat; r++){
+                for(int i = 0; i < n; i++){
+                        sortRow(matrix, i, i % 2 == 0);
                 }
 
-                for(int col = 0; col < n; col++){
-                        sortColumn(matrix, col);
+                // Transposición.
+                vector<vector<int>> transpose(n, vector<int>(n));
+                for(int i = 0; i < n; i++){
+                        for(int j = 0; j < n; j++){
+                                transpose[j][i] = matrix[i][j];
+                        }
+                }
+
+                // Ordenar filas de la transposición.
+                for(int i = 0; i < n; i++){
+                        sortRow(transpose, i, true);
+                }
+
+                // Volver a transponer.
+                for(int i = 0; i < n; i++){
+                        for(int j = 0; j < n; j++){
+                                matrix[j][i] = transpose[i][j];
+                        }
                 }
         }
 }
@@ -131,7 +133,7 @@ int main(){
         cout << "\nMatriz original:\n";
         printMatrix(matrix);
 	double start = step();
-        shearSort(matrix);
+        alternativeShearSort(matrix);
 	double end = step();
         cout << "Matriz ordenada con shearSort transpuesta:\n";
         printMatrix(matrix);
